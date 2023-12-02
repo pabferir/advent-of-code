@@ -1,6 +1,8 @@
-﻿namespace AdventOfCode._2023.Day01;
+﻿using AdventOfCode.Shared;
 
-internal class DailyPuzzle : IDailyPuzzle
+namespace AdventOfCode._2023.Day01;
+
+public class DailyPuzzle : IDailyPuzzle
 {
     private static readonly Dictionary<string, string> _numbers =
     new()
