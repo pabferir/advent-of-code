@@ -5,10 +5,6 @@ namespace AdventOfCode._2023.Day02;
 
 public class DailyPuzzle : IDailyPuzzle
 {
-    private const int RedCubesInBag = 12;
-    private const int GreenCubesInBag = 13;
-    private const int BlueCubesInBag = 14;
-
     public string Year => AdventOfCodeEvents.Year2023;
 
     public string Day => AdventDays.Day02;
@@ -34,27 +30,16 @@ public class DailyPuzzle : IDailyPuzzle
     /// <param name="input"></param>
     public object SolvePartOne(string[] input)
     {
-        int gameId = 1, possibleGamesIdsSum = 0;
-
-        foreach (var line in input)
+        return input.Select(line => new
         {
-            var gameSets = line.Split(':')[1].Split(';');
-            int currentSet = 0;
-            foreach (var set in gameSets)
-            {
-                currentSet++;
-                var redCubes = GetCubesCountInSet(set, @"\d+ red");
-                var greenCubes = GetCubesCountInSet(set, @"\d+ green");
-                var blueCubes = GetCubesCountInSet(set, @"\d+ blue");
-
-                if (IsGameImpossible(redCubes, greenCubes, blueCubes)) break;
-                else if (currentSet == gameSets.Length) possibleGamesIdsSum += gameId;
-            }
-
-            gameId++;
-        }
-
-        return possibleGamesIdsSum;
+            Id = GetCubesCount(line, @"Game (\d+)").First(),
+            RedCubes = GetCubesCount(line, @"(\d+) red").Max(),
+            GreenCubes = GetCubesCount(line, @"(\d+) green").Max(),
+            BlueCubes = GetCubesCount(line, @"(\d+) blue").Max()
+        })
+        .Where(game => game.RedCubes <= 12 && game.GreenCubes <= 13 && game.BlueCubes <= 14)
+        .Select(game => game.Id)
+        .Sum();
     }
 
     /// <summary>
@@ -77,56 +62,17 @@ public class DailyPuzzle : IDailyPuzzle
     /// </summary>
     public object SolvePartTwo(string[] input)
     {
-        int gameId = 1, minSetPowerSum = 0;
-
-        foreach (var line in input)
+        return input.Select(line => new
         {
-            var gameSets = line.Split(':')[1].Split(';');
-            int currentSet = 0, minRedCubesRequired = 0, minGreenCubesRequired = 0, minBlueCubesRequired = 0;
-            foreach (var set in gameSets)
-            {
-                currentSet++;
-                var redCubes = GetCubesCountInSet(set, @"\d+ red");
-                if (redCubes > minRedCubesRequired) minRedCubesRequired = redCubes;
-
-                var greenCubes = GetCubesCountInSet(set, @"\d+ green");
-                if (greenCubes > minGreenCubesRequired) minGreenCubesRequired = greenCubes;
-
-                var blueCubes = GetCubesCountInSet(set, @"\d+ blue");
-                if (blueCubes > minBlueCubesRequired) minBlueCubesRequired = blueCubes;
-
-                if (currentSet == gameSets.Length) minSetPowerSum += minRedCubesRequired * minGreenCubesRequired * minBlueCubesRequired;
-            }
-
-            gameId++;
-        }
-
-        return minSetPowerSum;
+            RedCubes = GetCubesCount(line, @"(\d+) red").Max(),
+            GreenCubes = GetCubesCount(line, @"(\d+) green").Max(),
+            BlueCubes = GetCubesCount(line, @"(\d+) blue").Max()
+        })
+        .Select(game => game.RedCubes * game.GreenCubes * game.BlueCubes)
+        .Sum();
     }
 
-    private static int GetCubesCountInSet(string set, string pattern)
-    {
-        var cubes = Regex.Match(set, pattern).Value;
-        var count = Regex.Match(cubes, @"\d+");
-
-        return count.Success ? int.Parse(count.Value) : 0;
-    }
-
-    private static bool IsGameImpossible(int redCubes, int greenCubes, int blueCubes)
-    {
-        if (redCubes > RedCubesInBag)
-        {
-            return true;
-        }
-        else if (greenCubes > GreenCubesInBag)
-        {
-            return true;
-        }
-        else if (blueCubes > BlueCubesInBag)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    private static IEnumerable<int> GetCubesCount(string line, string pattern) =>
+        Regex.Matches(line, pattern)
+             .Select(x => int.Parse(x.Groups[1].Value));
 }

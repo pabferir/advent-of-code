@@ -1,21 +1,22 @@
 ﻿using AdventOfCode.Shared;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode._2023.Day01;
 
 public class DailyPuzzle : IDailyPuzzle
 {
-    private static readonly Dictionary<string, string> _numbers =
+    private static readonly Dictionary<string, int> _numbers =
     new()
     {
-        { "one", "1" },
-        { "two", "2" },
-        { "three", "3" },
-        { "four","4" },
-        { "five", "5" },
-        { "six", "6" },
-        { "seven", "7" },
-        { "eight", "8" },
-        { "nine", "9" }
+        { "one", 1 },
+        { "two", 2 },
+        { "three", 3 },
+        { "four",4 },
+        { "five", 5 },
+        { "six", 6 },
+        { "seven", 7 },
+        { "eight", 8 },
+        { "nine", 9 }
     };
 
     public string Year => AdventOfCodeEvents.Year2023;
@@ -39,27 +40,13 @@ public class DailyPuzzle : IDailyPuzzle
     /// </summary>
     public object SolvePartOne(string[] input)
     {
-        var calibrationValuesSum = 0;
-
-        foreach (string line in input)
+        return input.Select(line => new
         {
-            string firstDigit = string.Empty, secondDigit = string.Empty;
-
-            for (var i = 0; i < line.Length; i++)
-            {
-                if (TryExtractDigit(line[i], out firstDigit)) break;
-            }
-
-            for (var i = line.Length - 1; i >= 0; i--)
-            {
-                if (TryExtractDigit(line[i], out secondDigit)) break;
-            }
-
-            var calibrationValue = int.Parse(string.Concat(firstDigit, secondDigit));
-            calibrationValuesSum += calibrationValue;
-        }
-
-        return calibrationValuesSum;
+            First = Regex.Match(line, @"\d").Value,
+            Last = Regex.Match(line, @"\d", RegexOptions.RightToLeft).Value
+        })
+        .Select(digits => int.Parse(digits.First) * 10 + int.Parse(digits.Last))
+        .Sum();
     }
 
     /// <summary>
@@ -78,55 +65,14 @@ public class DailyPuzzle : IDailyPuzzle
     /// </summary>
     public object SolvePartTwo(string[] input)
     {
-        var calibrationValuesSum = 0;
-
-        foreach (string line in input)
+        return input.Select(line => new
         {
-            string firstDigit = string.Empty, secondDigit = string.Empty;
-
-            for (var i = 0; i < line.Length; i++)
-            {
-                if (TryExtractDigit(line[i], out firstDigit)) break;
-                else if (TryExtractLiteralDigit(line[..(i + 1)], out firstDigit)) break;
-            }
-
-            for (var i = line.Length - 1; i >= 0; i--)
-            {
-                if (TryExtractDigit(line[i], out secondDigit)) break;
-                else if (TryExtractLiteralDigit(line[i..], out secondDigit)) break;
-            }
-
-            var calibrationValue = int.Parse(string.Concat(firstDigit, secondDigit));
-            calibrationValuesSum += calibrationValue;
-        }
-
-        return calibrationValuesSum;
+            First = Regex.Match(line, @"\d|one|two|three|four|five|six|seven|eight|nine").Value,
+            Last = Regex.Match(line, @"\d|one|two|three|four|five|six|seven|eight|nine", RegexOptions.RightToLeft).Value
+        })
+       .Select(digits => ParseDigit(digits.First) * 10 + ParseDigit(digits.Last))
+       .Sum();
     }
 
-    private static bool TryExtractDigit(char c, out string digit)
-    {
-        digit = string.Empty;
-
-        if (char.IsDigit(c))
-        {
-            digit += c;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static bool TryExtractLiteralDigit(string fragment, out string digit)
-    {
-        digit = string.Empty;
-
-        if (_numbers.Keys.Any(fragment.Contains))
-        {
-            var literal = _numbers.Keys.Single(fragment.Contains);
-            digit += _numbers[literal];
-            return true;
-        }
-
-        return false;
-    }
+    private static int ParseDigit(string digit) => _numbers.ContainsKey(digit) ? _numbers[digit] : int.Parse(digit);
 }
