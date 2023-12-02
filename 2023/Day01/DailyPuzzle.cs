@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace AdventOfCode._2023.Day01;
+﻿namespace AdventOfCode._2023.Day01;
 
 internal class DailyPuzzle : IDailyPuzzle
 {
@@ -18,8 +16,9 @@ internal class DailyPuzzle : IDailyPuzzle
         { "nine", "9" }
     };
 
-    public string YearDirectory => "2023";
-    public string DayDirectory => "Day01";
+    public string Year => AdventOfCodeEvents.Year2023;
+
+    public string Day => AdventDays.Day01;
 
     /// <summary>
     /// <para>--- Day 1: Trebuchet?! --- </para>

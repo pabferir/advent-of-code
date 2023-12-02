@@ -2,8 +2,8 @@
 
 internal interface IDailyPuzzle
 {
-    public string YearDirectory { get; }
-    public string DayDirectory { get; }
+    public string Year { get; }
+    public string Day { get; }
 
     object SolvePartOne(string[] input);
 

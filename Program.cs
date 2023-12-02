@@ -1,11 +1,11 @@
-﻿using AdventOfCode._2023.Day01;
+﻿using AdventOfCode._2023.Day02;
 using System.Reflection;
 
 var dailyPuzzle = new DailyPuzzle();
 
 var inputPath = Path.Combine(
     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-    $"{dailyPuzzle.YearDirectory}\\{dailyPuzzle.DayDirectory}\\input.txt");
+    $"{dailyPuzzle.Year}\\{dailyPuzzle.Day}\\input.txt");
 
 var input = File.ReadAllLines(inputPath);
 
