@@ -4,5 +4,6 @@ internal static class AdventDays
 {
     public const string Day01 = "Day01";
     public const string Day02 = "Day02";
+    public const string Day03 = "Day03";
     public const string Day04 = "Day04";
 }
