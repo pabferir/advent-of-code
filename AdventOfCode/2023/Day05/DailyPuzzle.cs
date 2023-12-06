@@ -119,9 +119,68 @@ public class DailyPuzzle : IDailyPuzzle
         return seeds.Min();
     }
 
+    /// <summary>
+    /// <para> --- Part Two --- </para>
+    /// <para> Everyone will starve if you only plant such a small number of seeds.Re-reading the almanac, it looks like the seeds line actually describes ranges of seed numbers.</para>
+    /// <para> The values on the initial seeds: line come in pairs.Within each pair, the first value is the start of the range and the second value is the length of the range.So, in the first line of the example above:</para>
+    /// <code>
+    /// seeds: 79 14 55 13
+    /// </code>
+    /// <para> This line describes two ranges of seed numbers to be planted in the garden.The first range starts with seed number 79 and contains 14 values: 79, 80, ..., 91, 92. The second range starts with seed number 55 and contains 13 values: 55, 56, ..., 66, 67.</para>
+    /// <para> Now, rather than considering four seed numbers, you need to consider a total of 27 seed numbers.</para>
+    /// <para> In the above example, the lowest location number can be obtained from seed number 82, which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45, humidity 46, and location 46. So, the lowest location number is 46.</para>
+    /// <para> Consider all of the initial seed numbers listed in the ranges on the first line of the almanac.What is the lowest location number that corresponds to any of the initial seed numbers?</para>
+    /// </summary>
+    /// <param name="input"></param>
     public object SolvePartTwo(string[] input)
     {
-        throw new NotImplementedException();
+        // Now every 2 seeds represent a range of seeds
+        var seeds = ParseNumbers(input[0]);
+        var seedRanges =
+            seeds.Where((_, index) => index % 2 == 0)
+                 .Zip(seeds.Where((_, index) => index % 2 == 1))
+                 .Select(tuple => new SeedRange(tuple.First, tuple.Second))
+                 .ToArray();
+
+        var mapsReversed = ParseMaps(input[1..]).Reverse().ToArray();
+
+        // ** INEFFICIENT
+        //var minLocation = long.MaxValue;
+        //foreach (var seedRange in seedRanges)
+        //{
+        //    for (var i = seedRange.Start; i < seedRange.Start + seedRange.Length; i++)
+        //    {
+        //        var seed = i;
+        //        for (var k = 0; k < maps.Length; k++)
+        //        {
+        //            seed = maps[k].Convert(seed);
+        //        }
+
+        //        if (seed < minLocation) minLocation = seed;
+        //    }
+        //}
+
+        // from i = 0 to max LOCATION mapped value
+        //      if i mapped all the way is in any seed range => return
+
+        var minLocation = 0L;
+        for (var i = 0L; i <= mapsReversed[0].MaxMappedDestination; i++)
+        {
+            var value = i;
+            for (var k = 0; k < mapsReversed.Length; k++)
+            {
+                value = mapsReversed[k].ConvertReverse(value);
+            }
+
+            // location now is the original seed
+            if (seedRanges.Any(seedRange => seedRange.Contains(value)))
+            {
+                minLocation = i;
+                break;
+            }
+        }
+
+        return minLocation;
     }
 
     private static IEnumerable<long> ParseNumbers(string line) =>
@@ -133,21 +192,30 @@ public class DailyPuzzle : IDailyPuzzle
              .Where(item => string.IsNullOrWhiteSpace(item.Content))
              .Select(item => item.Index + 1)
              .Select(start =>
-                new AlmanacMap(
-                    start,
-                    ParseMapLines(input.Skip(start).TakeWhile(line => line != " ")).ToList()));
+                new AlmanacMap(ParseMapLines(input.Skip(start).TakeWhile(line => !string.IsNullOrWhiteSpace(line))).ToList()));
 
     private static IEnumerable<AlmanacMapLine> ParseMapLines(IEnumerable<string> lines) =>
         lines.Select(ParseNumbers)
              .Where(numbers => numbers.Any())
-             .Select(numbers => new AlmanacMapLine(numbers.ElementAt(0), numbers.ElementAt(1), numbers.ElementAt(2)));
+             .Select(numbers =>
+                new AlmanacMapLine(numbers.ElementAt(0), numbers.ElementAt(1), numbers.ElementAt(2)));
 
-    record AlmanacMap(int Start, IEnumerable<AlmanacMapLine> Lines)
+    record AlmanacMap(IEnumerable<AlmanacMapLine> Lines)
     {
+        public long MaxMappedDestination => Lines.Max(line => line.Destination + line.Length);
+
         public long Convert(long number)
         {
             if (Lines.FirstOrDefault(line => line.CanConvert(number)) is AlmanacMapLine mapLine)
                 return number - mapLine.Source + mapLine.Destination;
+            else
+                return number;
+        }
+
+        public long ConvertReverse(long number)
+        {
+            if (Lines.FirstOrDefault(line => line.CanConvertReversed(number)) is AlmanacMapLine mapLine)
+                return number - mapLine.Destination + mapLine.Source;
             else
                 return number;
         }
@@ -157,5 +225,14 @@ public class DailyPuzzle : IDailyPuzzle
     {
         public bool CanConvert(long number) =>
             Source <= number && number < Source + Length;
+
+        public bool CanConvertReversed(long number) =>
+            Destination <= number && number < Destination + Length;
+    };
+
+    record SeedRange(long Start, long Length)
+    {
+        public bool Contains(long number) =>
+            Start <= number && number < Start + Length;
     };
 }
