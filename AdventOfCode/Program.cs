@@ -1,4 +1,4 @@
-﻿using AdventOfCode._2023.Day05;
+﻿using AdventOfCode._2023.Day06;
 using System.Reflection;
 
 var dailyPuzzle = new DailyPuzzle();
