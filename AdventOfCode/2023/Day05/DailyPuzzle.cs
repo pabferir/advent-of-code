@@ -100,14 +100,6 @@ public class DailyPuzzle : IDailyPuzzle
         var seeds = ParseNumbers(input[0]).ToArray();
         var maps = ParseMaps(input[1..]).ToArray();
 
-        // Map: Destination <= Source, RangeLength
-        // Maps are actually collections of ranges
-
-        // can jump from map to map
-        // if x is in any map range :: source <= x && x < source + length
-        //      then => number - source + destination
-        //      else => number
-
         for (var i = 0; i < seeds.Length; i++)
         {
             for (var k = 0; k < maps.Length; k++)
@@ -134,7 +126,6 @@ public class DailyPuzzle : IDailyPuzzle
     /// <param name="input"></param>
     public object SolvePartTwo(string[] input)
     {
-        // Now every 2 seeds represent a range of seeds
         var seeds = ParseNumbers(input[0]);
         var seedRanges =
             seeds.Where((_, index) => index % 2 == 0)
@@ -144,27 +135,8 @@ public class DailyPuzzle : IDailyPuzzle
 
         var mapsReversed = ParseMaps(input[1..]).Reverse().ToArray();
 
-        // ** INEFFICIENT
-        //var minLocation = long.MaxValue;
-        //foreach (var seedRange in seedRanges)
-        //{
-        //    for (var i = seedRange.Start; i < seedRange.Start + seedRange.Length; i++)
-        //    {
-        //        var seed = i;
-        //        for (var k = 0; k < maps.Length; k++)
-        //        {
-        //            seed = maps[k].Convert(seed);
-        //        }
-
-        //        if (seed < minLocation) minLocation = seed;
-        //    }
-        //}
-
-        // from i = 0 to max LOCATION mapped value
-        //      if i mapped all the way is in any seed range => return
-
-        var minLocation = 0L;
-        for (var i = 0L; i <= mapsReversed[0].MaxMappedDestination; i++)
+        long minLocation = 0;
+        for (long i = 0; i <= mapsReversed[0].MaxMappedDestination; i++)
         {
             var value = i;
             for (var k = 0; k < mapsReversed.Length; k++)
@@ -172,7 +144,6 @@ public class DailyPuzzle : IDailyPuzzle
                 value = mapsReversed[k].ConvertReverse(value);
             }
 
-            // location now is the original seed
             if (seedRanges.Any(seedRange => seedRange.Contains(value)))
             {
                 minLocation = i;
