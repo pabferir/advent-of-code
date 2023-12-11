@@ -14,20 +14,44 @@ public class DailyPuzzle : IDailyPuzzle
     public object SolvePartOne(string[] input)
     {
         var instructions = input[0];
-        var nodes = ParseNodes(input.Skip(2).ToArray())
-                        .ToDictionary(node => node.Id);
+        var nodes = ParseNodes(input.Skip(2));
 
-        var currentNode = nodes["AAA"];
+        return CalculateSteps(
+            instructions,
+            nodes.Single(node => node.Id == "AAA"),
+            nodes.Where(node => node.Id == "ZZZ"),
+            nodes.ToDictionary(node => node.Id));
+    }
+
+    public object SolvePartTwo(string[] input)
+    {
+        var instructions = input[0];
+        var nodes = ParseNodes(input.Skip(2));
+
+        var startNodes = ParseNodes(input.Skip(2)).Where(node => node.Id.Last() == 'A');
+
+        return startNodes.Select(node =>
+                       CalculateSteps(
+                           instructions,
+                           node,
+                           nodes.Where(node => node.Id.EndsWith('Z')),
+                           nodes.ToDictionary(node => node.Id)))
+                  .Aggregate(1L, Lcm);
+    }
+
+    private static long CalculateSteps(string instructions, NetworkNode start, IEnumerable<NetworkNode> ends, Dictionary<string, NetworkNode> network)
+    {
         var steps = 0;
+        var currentNode = start;
 
-        while (currentNode.Id != "ZZZ")
+        while (!ends.Contains(currentNode))
         {
             var nextStep = instructions[steps % instructions.Length];
 
             if (nextStep == 'L')
-                currentNode = nodes[currentNode.NextLeft];
+                currentNode = network[currentNode.NextLeft];
             else
-                currentNode = nodes[currentNode.NextRight];
+                currentNode = network[currentNode.NextRight];
 
             steps++;
         }
@@ -35,12 +59,15 @@ public class DailyPuzzle : IDailyPuzzle
         return steps;
     }
 
-    public object SolvePartTwo(string[] input)
-    {
-        throw new NotImplementedException();
-    }
+    // https://en.wikipedia.org/wiki/Least_common_multiple
+    private static long Lcm(long a, long b) =>
+        a * b / Gcd(a, b);
 
-    private static IEnumerable<NetworkNode> ParseNodes(string[] input) =>
+    // https://en.wikipedia.org/wiki/Greatest_common_divisor
+    private static long Gcd(long a, long b) =>
+        b == 0 ? a : Gcd(b, a % b);
+
+    private static IEnumerable<NetworkNode> ParseNodes(IEnumerable<string> input) =>
         input.Select(line => NodeRegex.Matches(line))
              .Select(matches => new NetworkNode(matches[0].Value, matches[1].Value, matches[2].Value));
 
