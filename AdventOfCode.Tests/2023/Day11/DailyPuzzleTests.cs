@@ -27,7 +27,7 @@ public class DailyPuzzleTests
         var output = _dailyPuzzle.SolvePartOne(input);
 
         // Assert
-        Assert.Equal(374, output);
+        Assert.Equal(374L, output);
     }
 
     [Fact]
@@ -51,6 +51,6 @@ public class DailyPuzzleTests
         var output = _dailyPuzzle.SolvePartTwo(input);
 
         // Assert
-        Assert.Equal(1030, output);
+        Assert.Equal(82000210L, output);
     }
 }
