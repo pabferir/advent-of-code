@@ -1,0 +1,1 @@
+pub(crate) const YEAR_2023: &'static str = "year2023";
