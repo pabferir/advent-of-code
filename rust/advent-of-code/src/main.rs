@@ -3,9 +3,9 @@ use std::fs;
 use crate::shared::daily_puzzle::DailyPuzzle;
 
 mod shared;
-mod year2023;
+mod year2024;
 
-type Puzzle = year2023::day_01::Day01;
+type Puzzle = year2024::day_01::Day01;
 
 fn main() {
     let path = format!("src/{}/{}/input.txt", &Puzzle::YEAR, &Puzzle::DAY);
