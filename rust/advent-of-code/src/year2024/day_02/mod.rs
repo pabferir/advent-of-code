@@ -1,4 +1,3 @@
-use core::panic;
 use crate::shared::{daily_puzzle::DailyPuzzle, days::DAY_02, events::YEAR_2024};
 
 #[cfg(test)]
@@ -12,28 +11,66 @@ impl DailyPuzzle<i32, i32> for Day02 {
 
     fn solve_part_one(input: &str) -> i32 {
         input.lines()
-        .filter(|report| is_save(&report))
-        .count() as i32
+            .map(|line| Report::from_str(line))
+            .filter(|report| report.is_safe())
+            .count() as i32
     }
 
     fn solve_part_two(input: &str) -> i32 {
-        panic!()
+        input.lines()
+            .map(|line| Report::from_str(line))
+            .filter(|report| {
+                if report.is_safe() {
+                    return true
+                }
+                
+                for i in 0..report.len() {
+                    let subreport = [&report[0..i], &report[i+1..]].concat();
+                    if subreport.is_safe() {
+                        return true
+                    }
+                }
+
+                false
+            })
+            .count() as i32
     }
 }
 
-fn is_save(report: &str) -> bool {
-    let mut levels: Vec<i32> = report
-        .split_whitespace()
-        .map(|level| level.parse::<i32>().unwrap())
-        .collect();
+type Report = Vec<i32>;
 
-    if levels.first() > levels.last() {
-        levels.reverse();
+trait FromStr {
+    fn from_str(s: &str) -> Self;
+}
+
+impl FromStr for Report {
+    fn from_str(s: &str) -> Self {
+        s.split_whitespace()
+            .map(|level| level.parse::<i32>().unwrap())
+            .collect()
     }
+}
 
-    levels.windows(2)
-        .all(|pair| {
-            let (a, b) = (pair[0], pair[1]);
-            a < b && (a - b).abs() < 4
-        })
+trait Safety {
+    fn is_safe(&self) -> bool;
+}
+
+impl Safety for Report {
+    fn is_safe(&self) -> bool {
+        let is_dec = self.first() > self.last();
+
+        self.windows(2)
+            .all(|pair| {
+                let (a, b) = (pair[0], pair[1]);
+                let diff = (a - b).abs();
+
+                let is_linear = if is_dec {
+                    a > b
+                } else {
+                    a < b
+                };
+
+                1 <= diff && diff <= 3 && is_linear
+            })
+    }
 }
