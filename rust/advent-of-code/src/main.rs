@@ -5,7 +5,7 @@ use crate::shared::daily_puzzle::DailyPuzzle;
 mod shared;
 mod year2024;
 
-type Puzzle = year2024::day_01::Day01;
+type Puzzle = year2024::day_02::Day02;
 
 fn main() {
     let path = format!("src/{}/{}/input.txt", &Puzzle::YEAR, &Puzzle::DAY);
