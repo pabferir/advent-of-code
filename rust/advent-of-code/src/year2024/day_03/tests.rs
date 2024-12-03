@@ -11,7 +11,7 @@ fn test_part_one() {
 
 #[test]
 fn test_part_two() {
-    let input = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))";
+    let input = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
 
-    assert_eq!(281, Puzzle::solve_part_two(input))
+    assert_eq!(48, Puzzle::solve_part_two(input))
 }
