@@ -20,5 +20,16 @@ MXMXAXMASX";
 
 #[test]
 fn test_part_two() {
-    todo!()
+    let input = "MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX";
+
+    assert_eq!(9, Puzzle::solve_part_two(input))
 }
