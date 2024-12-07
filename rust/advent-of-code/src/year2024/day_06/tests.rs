@@ -1,0 +1,19 @@
+use crate::shared::daily_puzzle::DailyPuzzle;
+
+type Puzzle = crate::year2024::day_06::Day06;
+
+#[test]
+fn test_part_one() {
+    let input = "....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...";
+
+    assert_eq!(41, Puzzle::solve_part_one(input))
+}
